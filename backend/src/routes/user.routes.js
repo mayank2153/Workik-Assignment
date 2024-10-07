@@ -1,16 +1,18 @@
 import { Router } from "express";
 import passport from "../middleware/githubauth.middleware.js";  // Import passport
+import { getUserById } from "../controllers/user.controller.js";
 
 const userRouter = Router();
 
-// GitHub OAuth login
-userRouter.get('/auth/github', passport.authenticate('github', { scope: [ 'user:email' ] }));
+userRouter.get("/user/:userId", getUserById);
 
-// GitHub OAuth callback
-userRouter.get('/auth/github/callback', 
+userRouter.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+userRouter.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/' }), 
   (req, res) => {
-    res.redirect('/dashboard');  
+    const userId = req.user.id;  
+    res.redirect(`http://localhost:5173/repos/${userId}`);
   }
 );
 

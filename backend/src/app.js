@@ -4,7 +4,7 @@ import cookieParser from 'cookie-parser';
 import session from "express-session";
 import passport from "./middleware/githubauth.middleware.js";  // Import GitHub middleware
 import userRouter from "./routes/user.routes.js";  // Ensure the correct extension
-
+import webHookRouter from "./routes/webhook.routes.js";
 const app = express();
 
 app.use(
@@ -34,7 +34,7 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(express.static("public"));
 
 app.use("/users", userRouter);
-
+app.use("/hook",webHookRouter)
 app.get("/", (req, res) => {
     res.send("Workik Assignment");
 });
