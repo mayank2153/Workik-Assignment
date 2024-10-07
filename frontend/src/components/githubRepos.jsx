@@ -11,8 +11,30 @@ export default function GitHubRepos() {
   const url = import.meta.env.VITE_BASE_URL || 'http://localhost:4000/';
 
   const createWebhook = async (owner, repo) => {
+    console.log("owner and repo name:", owner, repo);
+  
     try {
-      await axios.post(
+      const accessToken = user?.data?.accessToken;
+  
+      if (!accessToken) {
+        console.error("Missing access token for creating webhook.");
+        return; // Exit function early if no token
+      }
+  
+      console.log("Constructed URL:", `https://api.github.com/repos/${owner}/${repo}/hooks`);
+      console.log("Authorization header:", `Bearer ${accessToken}`);
+      console.log("Webhook data:", {
+        name: 'web',
+        active: true,
+        events: ['pull_request'],
+        config: {
+          url: `${url}hook/webhook`,
+          content_type: 'json',
+          secret: 'your-webhook-secret',
+        },
+      });
+  
+      const response = await axios.post(
         `https://api.github.com/repos/${owner}/${repo}/hooks`,
         {
           name: 'web',
@@ -26,16 +48,19 @@ export default function GitHubRepos() {
         },
         {
           headers: {
-            Authorization: `Bearer ${user?.data?.accessToken}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
+  
+      console.log("API response:", response); // Log the entire response object
+  
       alert('Webhook created successfully!');
     } catch (error) {
+      console.error("Error creating webhook:", error);
       alert('Error creating webhook: ' + error.message);
     }
   };
-
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -63,6 +88,7 @@ export default function GitHubRepos() {
           },
         });
         setRepos(reposResponse.data);
+        console.log("repo data",repos)
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred while fetching repos');
       } finally {

@@ -20,23 +20,23 @@ passport.use(
             clientID: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
             callbackURL: "http://localhost:4000/users/auth/github/callback",
+            scope: ['repo', 'user'] 
         },
         async (accessToken, refreshToken, profile, done) => {
             try {
                 console.log("GitHub profile:", profile);
                 const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
 
-                // Find or create the user in the database
                 let user = await User.findOne({ githubId: profile.id });
                 if (!user) {
                     user = await User.create({
                         githubId: profile.id,
                         username: profile.username,
                         email: email,
-                        accessToken: accessToken, // Store the access token in the user document
+                        accessToken: accessToken, 
                     });
                 } else {
-                    // Update the access token if the user already exists
+                    
                     user.accessToken = accessToken;
                     await user.save();
                 }
@@ -48,6 +48,5 @@ passport.use(
         }
     )
 );
-
 
 export default passport;

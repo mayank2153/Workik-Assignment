@@ -1,7 +1,7 @@
 const verifyGitHubSignature = (req, res, next) => {
     const payload = JSON.stringify(req.body);
     const signature = `sha256=${crypto
-      .createHmac('sha256', 'your-webhook-secret') // Replace with your webhook secret
+      .createHmac('sha256', 'your-webhook-secret') 
       .update(payload)
       .digest('hex')}`;
   
