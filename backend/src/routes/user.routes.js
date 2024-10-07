@@ -1,11 +1,17 @@
-import { Router } from "express"
-const userRouter=Router();
-userRouter.get('/auth/github', passport.authenticate('github', { scope: [ 'user:email' ] }))
+import { Router } from "express";
+import passport from "../middleware/githubauth.middleware.js";  // Import passport
 
-userRouter.get('/auth/github/callback',
-  passport.authenticate('github', { failureRedirect: '/' }),
+const userRouter = Router();
+
+// GitHub OAuth login
+userRouter.get('/auth/github', passport.authenticate('github', { scope: [ 'user:email' ] }));
+
+// GitHub OAuth callback
+userRouter.get('/auth/github/callback', 
+  passport.authenticate('github', { failureRedirect: '/' }), 
   (req, res) => {
-    // Successful authentication
-    res.redirect('/dashboard');
+    res.redirect('/dashboard');  
   }
-)
+);
+
+export default userRouter;

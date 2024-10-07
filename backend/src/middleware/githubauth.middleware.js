@@ -1,36 +1,53 @@
-import passport from "passport"
-import GithubStrategy from passport-github2
-import { User } from "../models/user.model.js"
+import passport from "passport";
+import { Strategy as GitHubStrategy } from "passport-github2";
+import { User } from "../models/user.model.js";
 
-// serializing user
+// Serializing user
 passport.serializeUser((user, done) => {
-    done(null, user.id)
-})
+    done(null, user.id);
+});
 
-//deserializing user
+// Deserializing user
 passport.deserializeUser((id, done) => {
     User.findById(id)
-    .then(user => {
-        done(null, user);
-    })
-    .catch(err => {
-        done(err, null);
-    });
+        .then(user => done(null, user))
+        .catch(err => done(err, null));
 });
 
 passport.use(
-    new Strategy(
+    new GitHubStrategy(
         {
-            GITHUB_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
-            GITHUB_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
-            callbackURL: "http://localhost:3000/auth/github/callback",
+            clientID: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+            callbackURL: "http://localhost:4000/users/auth/github/callback",
         },
         async (accessToken, refreshToken, profile, done) => {
-            return done(null, profile);
+            try {
+                console.log("GitHub profile:", profile);
+                const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
+
+                // Find or create the user in the database
+                let user = await User.findOne({ githubId: profile.id });
+                if (!user) {
+                    user = await User.create({
+                        githubId: profile.id,
+                        username: profile.username,
+                        email: email,
+                        accessToken: accessToken, // Store the access token in the user document
+                    });
+                } else {
+                    // Update the access token if the user already exists
+                    user.accessToken = accessToken;
+                    await user.save();
+                }
+
+                return done(null, user);
+            } catch (err) {
+                return done(err, null);
+            }
         }
     )
 );
-
 
 
 export default passport;
