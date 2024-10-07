@@ -6,7 +6,7 @@ const LoginPage=() => {
   const handleLogin = async () => {
     setIsLoading(true);
     // Redirecting to GitHub OAuth login
-    window.location.href = "http://localhost:4000/users/auth/github";
+    window.location.href = "https://workik-assignment-production.up.railway.app/users/auth/github";
   };
 
   return (

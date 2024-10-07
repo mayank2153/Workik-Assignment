@@ -19,7 +19,7 @@ passport.use(
         {
             clientID: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
-            callbackURL: "http://localhost:4000/users/auth/github/callback",
+            callbackURL: "https://workik-assignment-production.up.railway.app/users/auth/github/callback",
             scope: ['repo', 'user'] 
         },
         async (accessToken, refreshToken, profile, done) => {
