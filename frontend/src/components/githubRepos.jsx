@@ -9,17 +9,33 @@ export default function GitHubRepos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const url = import.meta.env.VITE_BASE_URL || 'http://localhost:4000/';
-
+  const validateToken = async (token) => {
+    try {
+      const response = await axios.get('https://api.github.com/user', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log("Token is valid. User:", response.data.login);
+      console.log("Token scopes:", response.headers['x-oauth-scopes']);
+      return true;
+    } catch (error) {
+      console.error("Token validation failed:", error.response ? error.response.data : error.message);
+      return false;
+    }
+  };
   const createWebhook = async (owner, repo) => {
     console.log("owner and repo name:", owner, repo);
   
     try {
-      const accessToken = user?.data?.accessToken;
-  
+      const PAT=import.meta.env.VITE_GITHUB_PAT;
+      const accessToken = PAT;
+
       if (!accessToken) {
         console.error("Missing access token for creating webhook.");
         return; // Exit function early if no token
       }
+      await validateToken(accessToken)
   
       console.log("Constructed URL:", `https://api.github.com/repos/${owner}/${repo}/hooks`);
       console.log("Authorization header:", `Bearer ${accessToken}`);
@@ -48,18 +64,37 @@ export default function GitHubRepos() {
         },
         {
           headers: {
-            Authorization: `Bearer ${accessToken}`,
+            Authorization: `Bearer ${PAT}`,
+            Accept: 'application/vnd.github.v3+json',
           },
         }
       );
   
-      console.log("API response:", response); // Log the entire response object
+      console.log("API response:", response); 
   
       alert('Webhook created successfully!');
-    } catch (error) {
-      console.error("Error creating webhook:", error);
-      alert('Error creating webhook: ' + error.message);
     }
+    catch (error) {
+      console.error("Error creating webhook:", error);
+      if (error.response) {
+        console.error("Response status:", error.response.status);
+        console.error("Response data:", error.response.data);
+        console.error("Response headers:", error.response.headers);
+        
+        if (error.response.status === 404) {
+          console.error("Repository not found or user doesn't have access");
+        } else if (error.response.status === 401) {
+          console.error("Unauthorized: Token may be invalid or expired");
+        } else if (error.response.status === 403) {
+          console.error("Forbidden: User may not have necessary permissions");
+        }
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+      } else {
+        console.error("Error setting up request:", error.message);
+      }
+      alert(`Error creating webhook: ${error.message}`);
+    }    
   };
   useEffect(() => {
     const fetchUser = async () => {
