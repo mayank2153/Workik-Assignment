@@ -25,19 +25,7 @@ passport.use(
             try {
                 console.log("GitHub profile:", profile);
                 
-                // Verify granted scopes
-                const grantedScopes = profile._json.scope ? profile._json.scope.split(',') : [];
-                console.log("Granted scopes:", grantedScopes);
-                
-                // Check if all required scopes were granted
-                const requiredScopes = ['repo', 'admin:repo_hook', 'user:email'];
-                const hasAllScopes = requiredScopes.every(scope => grantedScopes.includes(scope));
-                
-                if (!hasAllScopes) {
-                    console.warn("Not all required scopes were granted.");
-                    return done(new Error("Insufficient permissions granted. Please authorize all requested permissions."), null);
-                }
-
+               
                 const email = profile.emails && profile.emails.length > 0 ? profile.emails[0].value : null;
 
                 let user = await User.findOne({ githubId: profile.id });
@@ -46,12 +34,10 @@ passport.use(
                         githubId: profile.id,
                         username: profile.username,
                         email: email,
-                        accessToken: accessToken,
-                        scope: grantedScopes.join(',') // Store granted scopes
+                        accessToken: accessToken 
                     });
                 } else {
-                    user.accessToken = accessToken;
-                    user.scope = grantedScopes.join(','); // Update scopes
+                    user.accessToken = accessToken
                     await user.save();
                 }
 
