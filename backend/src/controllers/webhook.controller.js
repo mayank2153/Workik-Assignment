@@ -1,5 +1,5 @@
 import fetchPRDiff from "../config/getDiffData.js";
-
+import generateAIReview from "../config/generateAIReview.js";
 const createReview = async (req, res) => {
   try {
     const event = req.headers['x-github-event'];
@@ -17,7 +17,7 @@ const createReview = async (req, res) => {
       const title = prData?.title || 'No title';
       const body = prData?.body || 'No body';
       const diffUrl = prData?.diff_url;
-      const id = prData?.head?.repo?.owner?.id || prData?.user?.id; 
+      const id = prData?.base?.repo?.owner?.id || prData?.user?.id; 
       
       console.log('New pull request opened:', { title, diffUrl });
 
