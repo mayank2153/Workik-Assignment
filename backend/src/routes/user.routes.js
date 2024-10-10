@@ -5,8 +5,10 @@ import { getUserById } from "../controllers/user.controller.js";
 const userRouter = Router();
 
 userRouter.get("/user/:userId", getUserById);
-
-userRouter.get('/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+const REQUIRED_SCOPES = ['repo', 'admin:repo_hook', 'user:email'];
+userRouter.get('/auth/github', passport.authenticate('github', 
+  { scope: REQUIRED_SCOPES }
+));
 
 userRouter.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/' }), 
