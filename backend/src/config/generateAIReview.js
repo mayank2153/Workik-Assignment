@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const generateAIReview = async (title,body,diff) => {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
     const prompt = `
     You are reviewing a pull request titled "${title}". The description of the PR is: "${body}". 
@@ -18,7 +18,7 @@ const generateAIReview = async (title,body,diff) => {
     Provide a detailed review based on these criteria.
     `;
 
-    const result = await model.generateContent(prompt);
-    console.log(result.text());
+    const result = await model.generateContent([prompt]);
+    console.log(result.response.text());
 };
 export default generateAIReview
