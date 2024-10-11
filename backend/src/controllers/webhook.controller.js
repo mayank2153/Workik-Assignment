@@ -48,6 +48,7 @@ const createReview = async (req, res) => {
       const reviewComment = await generateAIReview(title, body, diff);
 
       // Post a review comment on the PR using GitHub API
+      console.log("review Comment:",reviewComment)
       await postReviewComment(repoOwner, repoName, prNumber, reviewComment,token);
 
       res.status(200).send('Review created successfully');
@@ -64,6 +65,7 @@ const createReview = async (req, res) => {
 
 // Function to post review comment
 const postReviewComment = async (owner, repo, pull_number, comment,token) => {
+  console.log("comment in function:",comment)
   const octokit = new Octokit({
     auth: token 
   });
