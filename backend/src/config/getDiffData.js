@@ -1,12 +1,8 @@
 import axios from "axios"
 import { User } from "../models/user.model.js";
-const fetchPRDiff = async (diff_url,id) => {
+const fetchPRDiff = async (diff_url,token) => {
     try {
-        const user = await User.findOne({githubId:id});
-        if(!user){
-            throw new Error("User not found")
-        }
-        const token = user?.accessToken;
+        
         const response = await axios.get(diff_url, {
         headers: {
           'Authorization': `token ${token}`,
