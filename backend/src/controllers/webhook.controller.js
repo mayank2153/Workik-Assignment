@@ -64,10 +64,14 @@ const createReview = async (req, res) => {
 };
 
 // Function to post review comment
-const postReviewComment = async (owner, repo, pull_number, comment,token) => {
-  console.log("comment in function:",comment)
+const postReviewComment = async (owner, repo, pull_number, comment, token) => {
+  if (!comment || comment.trim().length === 0) {
+    console.error('Review comment is empty');
+    throw new Error('Review comment cannot be empty');
+  }
+
   const octokit = new Octokit({
-    auth: token 
+    auth: token,
   });
 
   try {
@@ -75,17 +79,18 @@ const postReviewComment = async (owner, repo, pull_number, comment,token) => {
       owner,
       repo,
       pull_number,
-      body: comment,
-      event: 'COMMENT', 
+      body: comment, // Make sure this is a valid comment string
+      event: 'COMMENT',
       headers: {
-        'X-GitHub-Api-Version': '2022-11-28'
-      }
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
     });
     console.log('Review posted successfully');
   } catch (error) {
-    console.error('Error posting review:', error.response.data);
+    console.error('Error posting review:', error.response?.data || error.message);
     throw error;
   }
 };
+
 
 export { createReview };
