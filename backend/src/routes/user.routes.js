@@ -14,7 +14,7 @@ userRouter.get('/auth/github/callback',
   passport.authenticate('github', { failureRedirect: '/' }), 
   (req, res) => {
     const userId = req.user.id;  
-    res.redirect(`http://localhost:5173/repos/${userId}`);
+    res.redirect(`https://workik-assignment.onrender.com/repos/${userId}`);
   }
 );
 
