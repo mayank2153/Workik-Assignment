@@ -154,7 +154,7 @@ export default function GitHubRepos() {
     <div className="container mx-auto px-4 py-8 bg-gray-100 min-h-screen">
       {user && (
         <div className="mb-8 bg-white p-6 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-gray-800 mb-2">{user.name}'s Repositories</h1>
+          <h1 className="text-2xl font-bold text-gray-800 mb-2">{user.data.username}'s Repositories</h1>
         </div>
       )}
 
